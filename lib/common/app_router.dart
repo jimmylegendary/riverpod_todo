@@ -4,28 +4,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_todo/view/history_screen.dart';
 import 'package:riverpod_todo/view/home.dart';
 import 'package:riverpod_todo/view/settings_screen.dart';
-import 'package:riverpod_todo/view/today_screen.dart';
+import 'package:riverpod_todo/view/todos_screen.dart';
+import 'package:riverpod_todo/viewmodel/bottom_nav_ctrl.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/today',
+    initialLocation: '/todos',
     routes: [
       ShellRoute(
         builder: (context, state, child) {
-          return MainScreen();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ref.read(navigationIndexProvider.notifier).movePage(state);
+          });
+          return MainScreen(
+            child: child,
+            pageName: state.matchedLocation,
+          );
         },
         routes: [
           GoRoute(
-            path: '/today',
-            builder: (context, state) => TodayScreen(),
+            path: '/todos',
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: TodosScreen(),
+            ),
           ),
           GoRoute(
             path: '/history',
-            builder: (context, state) => HistoryScreen(),
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: HistoryScreen(),
+            ),
           ),
           GoRoute(
             path: '/settings',
-            builder: (context, state) => SettingsScreen(),
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: SettingsScreen(),
+            ),
           ),
         ],
       ),
