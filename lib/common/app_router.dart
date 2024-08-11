@@ -1,9 +1,9 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_todo/view/history_screen.dart';
 import 'package:riverpod_todo/view/home.dart';
 import 'package:riverpod_todo/view/settings_screen.dart';
+import 'package:riverpod_todo/view/todo_history.dart';
 import 'package:riverpod_todo/view/todos_screen.dart';
 import 'package:riverpod_todo/viewmodel/bottom_nav_ctrl.dart';
 
@@ -31,7 +31,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/history',
             pageBuilder: (context, state) => NoTransitionPage(
-              child: HistoryScreen(),
+              child: TodoHistory(),
             ),
           ),
           GoRoute(
