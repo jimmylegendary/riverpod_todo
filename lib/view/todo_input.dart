@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod_todo/viewmodel/todolist_ctrl.dart';
+import 'package:http/http.dart' as http;
 
 void showCalendarDatePicker(
   BuildContext context,
@@ -47,6 +49,19 @@ class TodoInput extends ConsumerWidget {
   setTodoItemDueState(WidgetRef ref, DateTime date) {
     final updatedTodo = ref.read(todoItemProvider).copyWith(newdueDate: date);
     ref.read(todoItemProvider.notifier).updateTodoItem(updatedTodo);
+  }
+
+  Future<String> addDetail(String title) async {
+    String webhook =
+        "https://nocodeai.app.n8n.cloud/webhook/09f89811-b0d8-4183-9063-91f6950877cf";
+    webhook += "?query=$title";
+    final url = Uri.parse(webhook);
+    var response = await http.get(url);
+    final Map<String, dynamic> responseData =
+        jsonDecode(utf8.decode(response.bodyBytes));
+    final outputValue = responseData['output'];
+
+    return outputValue;
   }
 
   @override
@@ -108,14 +123,14 @@ class TodoInput extends ConsumerWidget {
                                 field: field),
                             child: Text(_startDate == null
                                 ? 'Select Start Date'
-                                : DateFormat('yyyy/MM/dd').format(_startDate!)),
+                                : DateFormat('yyyy/MM/dd').format(_startDate)),
                           ),
                           if (field.hasError)
                             Padding(
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Text(
                                 field.errorText!,
-                                style: TextStyle(color: Colors.red),
+                                style: const TextStyle(color: Colors.red),
                               ),
                             ),
                         ],
@@ -140,7 +155,7 @@ class TodoInput extends ConsumerWidget {
                             child: Text(
                               _dueDate == null
                                   ? 'Select Due Date'
-                                  : DateFormat('yyyy/MM/dd').format(_dueDate!),
+                                  : DateFormat('yyyy/MM/dd').format(_dueDate),
                             ),
                           ),
                           if (field.hasError)
@@ -148,7 +163,7 @@ class TodoInput extends ConsumerWidget {
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Text(
                                 field.errorText!,
-                                style: TextStyle(color: Colors.red),
+                                style: const TextStyle(color: Colors.red),
                               ),
                             ),
                         ],
@@ -157,9 +172,11 @@ class TodoInput extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16.0),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (todoInputFormKey.currentState?.validate() == true) {
-                        final todoItem = ref.read(todoItemProvider);
+                        var todoItem = ref.read(todoItemProvider);
+                        final detail = await addDetail(todoItem.title);
+                        todoItem = todoItem.copyWith(newDetail: detail);
                         ref.read(todoListProvider.notifier).add(todoItem);
                         Navigator.of(context).pop(); // Close the dialog
                       }

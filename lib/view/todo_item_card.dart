@@ -51,7 +51,7 @@ class TodoItemCard extends ConsumerWidget {
           onTap: () {
             // 카드 클릭 시 작업 수행
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Tapped on ${todoData.title}')),
+              SnackBar(content: Text('${todoData.detail}')),
             );
           },
         ),
